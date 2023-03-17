@@ -88,11 +88,22 @@ export default function Game() {
   const moves = history.map((squares, move) => {
     let description;
     let isButton = true;
-    if (move === currentMove) {
-      description = "You are at move #" + move;
-      isButton = false;
-    } else if (move > 0) {
-      description = "Go to move #" + move;
+    if (move > 0) {
+      let prevSquares = history[move - 1];
+      let location = "";
+      for (let i = 0; i < 9; i++) {
+        if (squares[i] !== prevSquares[i]) {
+          location = Math.floor(i / 3) + ", " + (i % 3);
+          break;
+        }
+      }
+      if (move === currentMove) {
+        description =
+          "You are at move #" + move + " location (" + location + ")";
+        isButton = false;
+      } else {
+        description = "Go to move #" + move + " location (" + location + ")";
+      }
     } else {
       description = "Go to game start";
     }
