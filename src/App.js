@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 
-function Square({ value, onSquareClick }) {
+function Square({ value, isWin, onSquareClick }) {
   return (
-    <button className="square" onClick={onSquareClick}>
+    <button
+      className={`square ${isWin ? "square-win" : ""}`}
+      onClick={onSquareClick}
+    >
       {value}
     </button>
   );
@@ -10,7 +13,7 @@ function Square({ value, onSquareClick }) {
 
 function Board({ xIsNext, squares, onPlay }) {
   function handleClick(i) {
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares) !== null || squares[i]) {
       return;
     }
     const nextSquares = squares.slice();
@@ -22,9 +25,10 @@ function Board({ xIsNext, squares, onPlay }) {
     onPlay(nextSquares);
   }
   // show status
-  const winner = calculateWinner(squares);
+  const result = calculateWinner(squares);
   let status;
-  if (winner) {
+  if (result !== null) {
+    const winner = result.winner;
     status = "Winner: " + winner;
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
@@ -35,10 +39,12 @@ function Board({ xIsNext, squares, onPlay }) {
     let items = [];
     for (let j = 0; j < 3; j++) {
       let index = i * 3 + j;
+      let isWin = result !== null && result.pattern.includes(index);
       items.push(
         <Square
           key={"item-" + index}
           value={squares[index]}
+          isWin={isWin}
           onSquareClick={() => handleClick(index)}
         />
       );
@@ -100,7 +106,6 @@ export default function Game() {
       </li>
     );
   });
-
   const descMoves = moves.slice().reverse();
 
   return (
@@ -130,7 +135,7 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return { winner: squares[a], pattern: lines[i] };
     }
   }
   return null;
