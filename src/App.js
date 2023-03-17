@@ -62,6 +62,7 @@ export default function Game() {
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+  const [currentMoveSort, setCurrentMoveSort] = useState("ASC");
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -73,10 +74,15 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
+  function swapMoveSort() {
+    console.log("swapMoveSort");
+    setCurrentMoveSort(currentMoveSort === "ASC" ? "DES" : "ASC");
+  }
+
   const moves = history.map((squares, move) => {
     let description;
     let isButton = true;
-    if (move == currentMove) {
+    if (move === currentMove) {
       description = "You are at move #" + move;
       isButton = false;
     } else if (move > 0) {
@@ -95,13 +101,16 @@ export default function Game() {
     );
   });
 
+  const descMoves = moves.slice().reverse();
+
   return (
     <div className="game">
       <div className="game-board">
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
-        <ol>{moves}</ol>
+        <button onClick={() => swapMoveSort()}>{currentMoveSort}</button>
+        <ol>{currentMoveSort === "ASC" ? moves : descMoves}</ol>
       </div>
     </div>
   );
